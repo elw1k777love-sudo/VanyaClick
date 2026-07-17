@@ -1,155 +1,64 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Space Clicker</title>
-    <style>
-        body { background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 15px; user-select: none; -webkit-user-select: none; }
-        h1 { font-size: 24px; color: #38bdf8; text-transform: uppercase; margin: 5px; }
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .login-box { background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.3); width: 80%; max-width: 300px; }
-        .game-input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: 1px solid #38bdf8; background: #1e1b4b; color: #fff; text-align: center; font-size: 16px; box-sizing: border-box; }
-        .game-btn { background: linear-gradient(45deg, #38bdf8, #3b82f6); color: white; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; }
-        .score-box { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 16px; margin: 10px auto; max-width: 300px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .coins { font-size: 32px; font-weight: bold; color: #f59e0b; }
-        .target-btn { width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, #fcd34d, #d97706); border: 5px solid #fff; box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); margin: 15px auto; display: flex; align-items: center; justify-content: center; font-size: 55px; cursor: pointer; transition: transform 0.05s; -webkit-tap-highlight-color: transparent; }
-        .target-btn:active { transform: scale(0.9); }
-        .up-button { background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px 15px; font-size: 14px; font-weight: bold; border-radius: 12px; width: 95%; max-width: 320px; margin: 6px auto; display: flex; justify-content: space-between; }
-        .price { color: #fcd34d; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 6px; }
-        .leaderboard { background: rgba(0, 0, 0, 0.4); border-radius: 16px; padding: 15px; margin: 20px auto 0; max-width: 320px; box-sizing: border-box; border: 1px solid rgba(56, 189, 248, 0.2); }
-        .leaderboard h2 { font-size: 18px; color: #38bdf8; margin: 0 0 10px 0; text-transform: uppercase; }
-        .leader-wrap { max-height: 150px; overflow-y: auto; margin-bottom: 5px; }
-        .leader-item { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-        .leader-item.my-row { background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; border-radius: 8px; margin-top: 5px; }
-        .player-pos { color: #38bdf8; font-weight: bold; margin-right: 5px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Space Clicker</title>
+<style>
+body{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;font-family:sans-serif;text-align:center;margin:0;padding:15px;user-select:none;-webkit-user-select:none}
+h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
+#login-screen,#offline-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.95);display:flex;align-items:center;justify-content:center;z-index:100}
+#offline-screen{display:none;z-index:90}
+.login-box,.offline-box{background:rgba(255,255,255,0.05);padding:25px;border-radius:20px;border:1px solid rgba(56,189,248,0.3);width:80%;max-width:300px}
+.game-input{width:100%;padding:12px;margin:15px 0;border-radius:10px;border:1px solid #38bdf8;background:#1e1b4b;color:#fff;text-align:center;font-size:16px;box-sizing:border-box}
+.game-btn{background:linear-gradient(45deg,#38bdf8,#3b82f6);color:#fff;border:none;padding:12px 25px;font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;width:100%}
+.score-box{background:rgba(255,255,255,0.05);padding:12px;border-radius:16px;margin:10px auto;max-width:300px;border:1px solid rgba(255,255,255,0.1)}
+.coins{font-size:32px;font-weight:700;color:#f59e0b}
+.target-btn{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#fcd34d,#d97706);border:5px solid #fff;box-shadow:0 0 25px rgba(245,158,11,0.5);margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:55px;cursor:pointer;transition:transform .05s;-webkit-tap-highlight-color:transparent}
+.target-btn:active{transform:scale(0.9)}
+.up-button{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 15px;font-size:14px;font-weight:700;border-radius:12px;width:95%;max-width:320px;margin:6px auto;display:flex;justify-content:space-between}
+.price{color:#fcd34d;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:6px}
+.leaderboard{background:rgba(0,0,0,0.4);border-radius:16px;padding:15px;margin:20px auto 0;max-width:320px;box-sizing:border-box;border:1px solid rgba(56,189,248,0.2)}
+.leaderboard h2{font-size:18px;color:#38bdf8;margin:0 0 10px 0;text-transform:uppercase}
+.leader-wrap{max-height:150px;overflow-y:auto;margin-bottom:5px}
+.leader-item{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px}
+.leader-item.my-row{background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:8px;margin-top:5px}
+.player-pos{color:#38bdf8;font-weight:700;margin-right:5px}
+</style>
 </head>
 <body>
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>ВХОД В ИГРУ</h2>
-            <input type="text" id="nickname-input" class="game-input" placeholder="Введите ваш ник..." maxlength="14">
-            <button class="game-btn" id="btn-start">ИГРАТЬ</button>
-        </div>
-    </div>
-    <h1>Space Clicker 🚀</h1>
-    <div class="score-box">
-        <div class="coins" id="balance">0 🪙</div>
-        <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Клик: +<span id="click-pow">1</span> | Авто: +<span id="cps">0</span>/с</div>
-    </div>
-    <div class="target-btn" id="main-clicker">🛸</div>
-    <button class="up-button" id="btn-up-click"><span>⚡ Сила тапа (+1)</span><span class="price" id="cost-click">15 🪙</span></button>
-    <button class="up-button" id="btn-up-auto"><span>🤖 Авто-майнер (+1/с)</span><span class="price" id="cost-auto">50 🪙</span></button>
-    <div class="leaderboard">
-        <h2>🏆 ТОП ИГРОКОВ (100 мест)</h2>
-        <div class="leader-wrap" id="leaderboard-list">Подключение...</div>
-    </div>
-    <script>
-        const dbUrl = "https://firebasedatabase.app";
-        let playerName = localStorage.getItem('sc_player_name') || "";
-        if (playerName) { 
-            document.getElementById('login-screen').style.display = 'none'; 
-            document.getElementById('nickname-input').value = playerName;
-        }
-        let score = Number(localStorage.getItem('sc_score')) || 0;
-        let clickPower = Number(localStorage.getItem('sc_v1_clickPower')) || 1;
-        let autoScore = Number(localStorage.getItem('sc_autoScore')) || 0;
-        let costClick = Number(localStorage.getItem('sc_costClick')) || 15;
-        let costAuto = Number(localStorage.getItem('sc_costAuto')) || 50;
-        const balanceEl = document.getElementById('balance');
-        const clickPowEl = document.getElementById('click-pow');
-        const cpsEl = document.getElementById('cps');
-        const leadListEl = document.getElementById('leaderboard-list');
-        function updateUI() {
-            balanceEl.innerText = score + " 🪙";
-            clickPowEl.innerText = clickPower;
-            cpsEl.innerText = autoScore;
-            document.getElementById('cost-click').innerText = costClick + " 🪙";
-            document.getElementById('cost-auto').innerText = costAuto + " 🪙";
-        }
-        function saveGame() {
-            localStorage.setItem('sc_score', score);
-            localStorage.setItem('sc_v1_clickPower', clickPower);
-            localStorage.setItem('sc_autoScore', autoScore);
-            localStorage.setItem('sc_costClick', costClick);
-            localStorage.setItem('sc_costAuto', costAuto);
-            if (playerName) {
-                fetch(`${dbUrl}users/${playerName}.json`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ score: score })
-                }).catch(e => console.error(e));
-            }
-        }
-        document.getElementById('btn-start').addEventListener('click', () => {
-            let inputName = document.getElementById('nickname-input').value.trim();
-            playerName = inputName ? inputName : "Игрок_" + Math.floor(Math.random() * 1000);
-            localStorage.setItem('sc_player_name', playerName);
-            document.getElementById('login-screen').style.display = 'none';
-            saveGame();
-            updateUI();
-            initLeaderboard();
-        });
-        document.getElementById('main-clicker').addEventListener('click', () => { 
-            score += clickPower; 
-            updateUI(); 
-            saveGame(); 
-        });
-        document.getElementById('btn-up-click').addEventListener('click', () => { 
-            if (score >= costClick) { 
-                score -= costClick; 
-                clickPower += 1; 
-                costClick = Math.round(costClick * 1.5); 
-                updateUI(); 
-                saveGame(); 
-            } 
-        });
-        document.getElementById('btn-up-auto').addEventListener('click', () => { 
-            if (score >= costAuto) { 
-                score -= costAuto; 
-                autoScore += 1; 
-                costAuto = Math.round(costAuto * 1.6); 
-                updateUI(); 
-                saveGame(); 
-            } 
-        });
-        setInterval(() => { 
-            score += autoScore; 
-            updateUI(); 
-            if(autoScore > 0) saveGame(); 
-        }, 1000);
-        function initLeaderboard() {
-            fetch(`${dbUrl}users.json`)
-                .then(res => res.json())
-                .then(data => {
-                    let players = [];
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            players.push({ name: key, score: data[key].score || 0 });
-                        });
-                    }
-                    players.sort((a, b) => b.score - a.score);
-                    leadListEl.innerHTML = "";
-                    players.slice(0, 100).forEach((player, index) => {
-                        let isMe = (player.name === playerName);
-                        leadListEl.innerHTML += `
-                            <div class="leader-item ${isMe ? 'my-row' : ''}">
-                                <span><span class="player-pos">#${index + 1}</span> ${player.name}</span>
-                                <span>${player.score} 🪙</span>
-                            </div>`;
-                    });
-                    if (players.length === 0) leadListEl.innerText = "Список пуст.";
-                })
-                .catch(error => {
-                    leadListEl.innerText = "Ошибка загрузки";
-                });
-        }
-        if (playerName) {
-            updateUI();
-            initLeaderboard();
-            setInterval(initLeaderboard, 10000);
-        }
-    </script>
+<div id="login-screen"><div class="login-box"><h2>ВХОД В ИГРУ</h2><input type="text" id="nickname-input" class="game-input" placeholder="Введите ваш ник..." maxlength="14"><button class="game-btn" id="btn-start">ИГРАТЬ</button></div></div>
+<div id="offline-screen"><div class="offline-box"><h2 style="color:#fcd34d;margin:0 0 10px 0">🤖 С ВОЗВРАЩЕНИЕМ!</h2><p id="offline-report" style="font-size:16px;color:#e2e8f0;line-height:1.5;margin:15px 0">Майнеры трудились в ваше отсутствие!</p><button class="game-btn" id="btn-offline-claim">ЗАБРАТЬ МОНЕТЫ</button></div></div>
+<h1>Space Clicker 🚀</h1>
+<div class="score-box"><div class="coins" id="balance">0 🪙</div><div style="color:#94a3b8;font-size:13px;margin-top:5px">Клик: +<span id="click-pow">1</span> | Авто: +<span id="cps">0</span>/с</div></div>
+<div class="target-btn" id="main-clicker">🛸</div>
+<button class="up-button" id="btn-up-click"><span>⚡ Сила тапа (+1)</span><span class="price" id="cost-click">15 🪙</span></button>
+<button class="up-button" id="btn-up-auto"><span>🤖 Авто-майнер (+1/с)</span><span class="price" id="cost-auto">50 🪙</span></button>
+<div class="leaderboard"><h2>🏆 ТОП ИГРОКОВ (100 мест)</h2><div class="leader-wrap" id="leaderboard-list">Подключение...</div></div>
+<script>
+const dbUrl="https://firebasedatabase.app";
+let playerName=localStorage.getItem('sc_player_name')||"";
+if(playerName){document.getElementById('login-screen').style.display='none';document.getElementById('nickname-input').value=playerName}
+let score=Number(localStorage.getItem('sc_score'))||0;
+let clickPower=Number(localStorage.getItem('sc_v1_clickPower'))||1;
+let autoScore=Number(localStorage.getItem('sc_autoScore'))||0;
+let costClick=Number(localStorage.getItem('sc_costClick'))||15;
+let costAuto=Number(localStorage.getItem('sc_costAuto'))||50;
+const balanceEl=document.getElementById('balance');
+const clickPowEl=document.getElementById('click-pow');
+const cpsEl=document.getElementById('cps');
+const leadListEl=document.getElementById('leaderboard-list');
+function updateUI(){balanceEl.innerText=score+" 🪙";clickPowEl.innerText=clickPower;cpsEl.innerText=autoScore;document.getElementById('cost-click').innerText=costClick+" 🪙";document.getElementById('cost-auto').innerText=costAuto+" 🪙"}
+function saveGame(){localStorage.setItem('sc_score',score);localStorage.setItem('sc_v1_clickPower',clickPower);localStorage.setItem('sc_autoScore',autoScore);localStorage.setItem('sc_costClick',costClick);localStorage.setItem('sc_costAuto',costAuto);localStorage.setItem('sc_last_time',Math.floor(Date.now()/1000));if(playerName){fetch(`${dbUrl}users/${playerName}.json`,{method:'PUT',body:JSON.stringify({score:score})}).catch(e=>console.error(e))}}
+function checkOfflineIncome(){if(autoScore > 0){let lastTime=Number(localStorage.getItem('sc_last_time'))||0;if(lastTime > 0){let currentTime=Math.floor(Date.now()/1000);let secondsPassed=currentTime-lastTime;if(secondsPassed > 43200)secondsPassed=43200;if(secondsPassed > 10){let income=secondsPassed * autoScore;score+=income;document.getElementById('offline-report').innerText=`Пока вас не было ${secondsPassed} сек., ваши автоматические майнеры добыли ${income} 🪙!`;document.getElementById('offline-screen').style.display='flex';updateUI();saveGame()}}}}
+document.getElementById('btn-offline-claim').addEventListener('click',()=>{document.getElementById('offline-screen').style.display='none'});
+document.getElementById('btn-start').addEventListener('click',()=>{let inputName=document.getElementById('nickname-input').value.trim();playerName=inputName?inputName:"Игрок_"+Math.floor(Math.random()*1000);localStorage.setItem('sc_player_name',playerName);document.getElementById('login-screen').style.display='none';saveGame();updateUI();checkOfflineIncome();initLeaderboard()});
+document.getElementById('main-clicker').addEventListener('click',()=>{score+=clickPower;updateUI();saveGame()});
+document.getElementById('btn-up-click').addEventListener('click',()=>{if(score >= costClick){score-=costClick;clickPower+=1;costClick=Math.round(costClick*1.5);updateUI();saveGame()}});
+document.getElementById('btn-up-auto').addEventListener('click',()=>{if(score >= costAuto){score-=costAuto;autoScore+=1;costAuto=Math.round(costAuto*1.6);updateUI();saveGame()}});
+setInterval(()=>{score+=autoScore;updateUI();if(autoScore > 0)saveGame()},1000);
+function initLeaderboard(){fetch(`${dbUrl}users.json`).then(res=>res.json()).then(data=>{let players=[];if(data){Object.keys(data).forEach(key=>{players.push({name:key,score:data[key].score||0})})}players.sort((a,b)=>b.score-a.score);leadListEl.innerHTML="";players.slice(0,100).forEach((player,index)=>{let isMe=(player.name===playerName);leadListEl.innerHTML+=`<div class="leader-item ${isMe?'my-row':''} code-line"><span><span class="player-pos">#${index+1}</span> ${player.name}</span><span>${player.score} 🪙</span></div>`});if(players.length===0)leadListEl.innerText="Список пуст."}).catch(error=>{leadListEl.innerText="Ошибка загрузки"})}
+if(playerName){updateUI();checkOfflineIncome();initLeaderboard();setInterval(initLeaderboard,10000)}
+</script>
 </body>
 </html>
