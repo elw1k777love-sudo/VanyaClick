@@ -25,6 +25,7 @@ h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
 .leader-item.my-row{background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:8px;margin-top:5px}
 .player-pos{color:#38bdf8;font-weight:700;margin-right:5px}
 </style>
+
 <script src="https://gstatic.com"></script>
 <script src="https://gstatic.com"></script>
 </head>
@@ -38,7 +39,10 @@ h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
 <button class="up-button" id="btn-up-auto"><span>🤖 Авто-майнер (+1/с)</span><span class="price" id="cost-auto">50 🪙</span></button>
 <div class="leaderboard"><h2>🏆 ТОП ИГРОКОВ (100 мест)</h2><div class="leader-wrap" id="leaderboard-list">Подключение...</div></div>
 <script>
-const firebaseConfig={databaseURL:"https://firebasedatabase.app"};
+// Твоя ссылка успешно вставлена и настроена:
+const firebaseConfig={
+  databaseURL: "https://click-f3faa-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
 firebase.initializeApp(firebaseConfig);
 const database=firebase.database();
 let playerName=localStorage.getItem('sc_player_name')||"";
@@ -61,7 +65,7 @@ document.getElementById('main-clicker').addEventListener('click',()=>{score+=cli
 document.getElementById('btn-up-click').addEventListener('click',()=>{if(score >= costClick){score-=costClick;clickPower+=1;costClick=Math.round(costClick*1.5);updateUI();saveGame()}});
 document.getElementById('btn-up-auto').addEventListener('click',()=>{if(score >= costAuto){score-=costAuto;autoScore+=1;costAuto=Math.round(costAuto*1.6);updateUI();saveGame()}});
 setInterval(()=>{score+=autoScore;updateUI();if(autoScore > 0)saveGame()},1000);
-function initLeaderboard(){database.ref('users').orderByChild('score').limitToLast(100).on('value',(snapshot)=>{let players=[];snapshot.forEach((childSnapshot)=>{players.push({name:childSnapshot.key,score:childSnapshot.val().score||0})});players.reverse();leadListEl.innerHTML="";players.forEach((player,index)=>{let isMe=(player.name===playerName);leadListEl.innerHTML+=`<div class="leader-item ${isMe?'my-row':''}"><span><span class="player-pos">#${index+1}</span> ${player.name}</span><span>${player.score} 🪙</span></div>`});if(players.length===0)leadListEl.innerText="Список пуст."},(error)=>{leadListEl.innerText="Ошибка загрузки"})}
+function initLeaderboard(){database.ref('users').orderByChild('score').limitToLast(100).on('value',(snapshot)=>{let players=[];snapshot.forEach((childSnapshot)=>{players.push({name:childSnapshot.key,score:childSnapshot.val().score||0})});players.reverse();leadListEl.innerHTML="";players.forEach((player,index)=>{let isMe=(player.name===playerName);leadListEl.innerHTML+=`<div class="leader-item ${isMe?'my-row':''}"><span><span class="player-pos">#${index+1}</span> ${player.name}</span><span>${player.score} 🪙</span></div>`});if(players.length===0)leadListEl.innerText="Список пуст."},(error)=>{leadListEl.innerText="Ошибка: "+error.message})}
 if(playerName){updateUI();checkOfflineIncome();initLeaderboard()}
 </script>
 </body>
