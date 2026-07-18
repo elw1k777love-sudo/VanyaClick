@@ -3,21 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Space Clicker</title>
+<title>Vanya Clicker</title>
 <style>
-body{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;font-family:sans-serif;text-align:center;margin:0;padding:15px;user-select:none;-webkit-user-select:none}
+body{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;font-family:sans-serif;text-align:center;margin:0;padding:15px;user-select:none;-webkit-user-select:none;transition:background 0.5s ease}
 h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
-#login-screen,#offline-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.95);display:flex;align-items:center;justify-content:center;z-index:100}
+#login-screen,#offline-screen,.modal-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.95);display:flex;align-items:center;justify-content:center;z-index:100}
 #offline-screen{display:none;z-index:90}
-.login-box,.offline-box{background:rgba(255,255,255,0.05);padding:25px;border-radius:20px;border:1px solid rgba(56,189,248,0.3);width:80%;max-width:300px}
+.modal-screen{display:none;z-index:110}
+.modal-box{background:rgba(30,27,75,0.98);padding:25px;border-radius:20px;border:2px solid rgba(56,189,248,0.5);width:90%;max-width:320px;box-sizing:border-box;position:relative;box-shadow:0 0 30px rgba(56,189,248,0.3)}
+.login-box,.offline-box{background:rgba(30,27,75,0.95);padding:25px;border-radius:20px;border:2px solid rgba(56,189,248,0.5);width:85%;max-width:320px;box-sizing:border-box;box-shadow:0 0 30px rgba(56,189,248,0.2)}
+.close-btn{position:absolute;top:10px;right:15px;font-size:24px;color:#94a3b8;cursor:pointer;font-weight:bold}
+.close-btn:hover{color:#ef4444}
 .game-input{width:100%;padding:12px;margin:15px 0;border-radius:10px;border:1px solid #38bdf8;background:#1e1b4b;color:#fff;text-align:center;font-size:16px;box-sizing:border-box}
-.game-btn{background:linear-gradient(45deg,#38bdf8,#3b82f6);color:#fff;border:none;padding:12px 25px;font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;width:100%}
+.game-btn{background:linear-gradient(45deg,#38bdf8,#3b82f6);color:#fff;border:none;padding:12px 25px;font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;width:100%;margin-top:10px}
 .score-box{background:rgba(255,255,255,0.05);padding:12px;border-radius:16px;margin:10px auto;max-width:300px;border:1px solid rgba(255,255,255,0.1)}
 .coins{font-size:32px;font-weight:700;color:#f59e0b}
-.target-btn{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#fcd34d,#d97706);border:5px solid #fff;box-shadow:0 0 25px rgba(245,158,11,0.5);margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:55px;cursor:pointer;transition:transform .05s;-webkit-tap-highlight-color:transparent}
-.target-btn:active{transform:scale(0.9)}
-.up-button{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 15px;font-size:14px;font-weight:700;border-radius:12px;width:95%;max-width:320px;margin:6px auto;display:flex;justify-content:space-between}
+
+/* Главная кнопка с упругим сжатием при тапе */
+.target-btn{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#fcd34d,#d97706);border:5px solid #fff;box-shadow:0 0 25px rgba(245,158,11,0.5);margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:55px;cursor:pointer;transition:transform 0.05s ease-out;-webkit-tap-highlight-color:transparent;position:relative}
+.target-btn:active{transform:scale(0.90)}
+
+/* Всплывающие цифры при тапе */
+.floating-text{position:absolute;font-size:24px;font-weight:bold;color:#fcd34d;text-shadow:0 2px 4px rgba(0,0,0,0.6);pointer-events:none;animation:floatUp 0.5s ease-out forwards;z-index:200}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%, -50%) scale(1)}100%{opacity:0;transform:translate(-50%, -150%) scale(1.3)}}
+
+.up-button{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 15px;font-size:14px;font-weight:700;border-radius:12px;width:95%;max-width:320px;margin:6px auto;display:flex;justify-content:space-between;align-items:center}
 .price{color:#fcd34d;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:6px}
+
+/* --- МАГАЗИН И ОБНОВЛЕННЫЕ РЕДКОСТИ --- */
+.shop-container{background:rgba(255,255,255,0.03);border:1px solid rgba(168,85,247,0.3);border-radius:16px;padding:15px;margin:15px auto;max-width:320px;box-sizing:border-box}
+.shop-container h2{font-size:16px;color:#c084fc;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:1px}
+.shop-item{background:rgba(15,23,42,0.8);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;box-sizing:border-box;cursor:pointer;transition:transform 0.2s}
+.shop-item:active{transform:scale(0.98)}
+.shop-item-info{display:flex;align-items:center;gap:12px;text-align:left}
+.shop-avatar-emoji{font-size:28px;background:rgba(255,255,255,0.05);width:45px;height:45px;border-radius:50%;line-height:45px;text-align:center;border:1px solid rgba(255,255,255,0.2);flex-shrink:0}
+.char-name{font-weight:bold;font-size:14px;color:#fff}
+.char-rarity{font-size:11px;text-transform:uppercase;display:block;font-weight:bold}
+.char-bonus{font-size:12px;color:#22c55e;display:block;margin-top:2px}
+.buy-char-btn{background:#4b5563;color:#fff;border:none;padding:8px 10px;font-size:12px;font-weight:bold;border-radius:8px;cursor:pointer;flex-shrink:0;min-width:85px}
+
+/* Редкие — синий цвет */
+.rare { border: 2px solid #38bdf8; box-shadow: inset 0 0 10px rgba(56,189,248,0.2); }
+.rare .char-rarity { color: #38bdf8; }
+.rare .buy-char-btn { background: #3b82f6; }
+
+/* Эпические — фиолетовый цвет */
+.epic { border: 2px solid #a855f7; box-shadow: inset 0 0 10px rgba(168,85,247,0.2); }
+.epic .char-rarity { color: #c084fc; }
+.epic .buy-char-btn { background: #a855f7; }
+
+/* Мифические — красный цвет */
+.mythic { border: 2px solid #ef4444; box-shadow: inset 0 0 12px rgba(239,68,68,0.3); }
+.mythic .char-rarity { color: #f87171; }
+.mythic .buy-char-btn { background: #ef4444; }
+
+/* Легендарные — желтый как солнце */
+.legendary { border: 2px solid #f59e0b; box-shadow: inset 0 0 15px rgba(245,158,11,0.4); }
+.legendary .char-rarity { color: #fbbf24; }
+.legendary .buy-char-btn { background: linear-gradient(45deg, #f59e0b, #eab308); color: #000; font-weight: 900; }
+
+/* Дизайн кнопок в окнах локаций и настроений */
+.modal-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; max-height: 280px; overflow-y: auto; }
+.loc-item, .mood-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; text-align: left; }
+.loc-item.active { border-color: #22c55e; background: rgba(34,197,94,0.1); }
+.mood-btn, .loc-btn { background: #3b82f6; border: none; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; min-width: 80px; }
+.mood-btn:disabled, .loc-btn:disabled { background: #4b5563!important; color: #9ca3af!important; cursor: not-allowed; }
+
 .leaderboard{background:rgba(0,0,0,0.4);border-radius:16px;padding:15px;margin:20px auto 0;max-width:320px;box-sizing:border-box;border:1px solid rgba(56,189,248,0.2)}
 .leaderboard h2{font-size:18px;color:#38bdf8;margin:0 0 10px 0;text-transform:uppercase}
 .leader-wrap{max-height:180px;overflow-y:auto;margin-bottom:5px}
@@ -27,7 +78,6 @@ h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
 </style>
 </head>
 <body>
-
 <div id="login-screen">
   <div class="login-box">
     <h2>ВХОД В ИГРУ</h2>
@@ -44,23 +94,132 @@ h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
   </div>
 </div>
 
-<h1>Space Clicker 🚀</h1>
+<!-- Модальное окно ЛОКАЦИЙ -->
+<div id="locations-modal" class="modal-screen">
+  <div class="modal-box">
+    <span class="close-btn" id="close-loc-btn">&times;</span>
+    <h2 style="color:#38bdf8;margin:0">🌍 ВЫБОР ЛОКАЦИИ</h2>
+    <div class="modal-grid" id="locations-list">
+      <!-- Локации генерируются через JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно НАСТРОЕНИЙ ПЕРСОНАЖА -->
+<div id="moods-modal" class="modal-screen">
+  <div class="modal-box">
+    <span class="close-btn" id="close-mood-btn">&times;</span>
+    <h2 id="mood-modal-title" style="color:#c084fc;margin:0">🎭 НАСТРОЕНИЕ</h2>
+    <p style="font-size:12px;color:#94a3b8;margin:5px 0 15px 0">Улучшайте настроение для множителя буста!</p>
+    <div class="modal-grid" id="moods-list">
+      <!-- Настроения генерируются через JavaScript -->
+    </div>
+  </div>
+</div>
+
+<h1>Vanya Clicker 🚀</h1>
+
 <div class="score-box">
   <div class="coins" id="balance">0 🪙</div>
   <div style="color:#94a3b8;font-size:13px;margin-top:5px">Клик: +<span id="click-pow">1</span> | Авто: +<span id="cps">0</span>/с</div>
 </div>
 
+<!-- Главная кнопка клика -->
 <div class="target-btn" id="main-clicker">🛸</div>
+
+<!-- Отдельная кнопка для локаций -->
+<button class="game-btn" id="open-loc-btn" style="max-width:320px;margin:10px auto;display:block;background:linear-gradient(45deg,#059669,#10b981)">🌍 СМЕНИТЬ ЛОКАЦИЮ</button>
+
 <button class="up-button" id="btn-up-click"><span>⚡ Сила тапа (+1)</span><span class="price" id="cost-click">15 🪙</span></button>
 <button class="up-button" id="btn-up-auto"><span>🤖 Авто-майнер (+1/с)</span><span class="price" id="cost-auto">50 🪙</span></button>
 
-<div class="leaderboard">
-  <h2>🏆 ТОП ИГРОКОВ</h2>
-  <div class="leader-wrap" id="leaderboard-list">Загрузка космического топа...</div>
+<div class="shop-container">
+  <h2>🌌 МАГАЗИН ПЕРСОНАЖЕЙ</h2>
+  <p style="font-size:11px;color:#94a3b8;margin:-5px 0 12px 0">(Кликни на купленного героя для смены настроения)</p>
+  
+  <!-- Папа (Редкий) -->
+  <div class="shop-item rare" id="item-papa">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-papa">👑</div>
+      <div>
+        <span class="char-name">Папа <span id="label-mood-papa">👑</span></span>
+        <span class="char-rarity">Редкий</span>
+        <span class="char-bonus">Буст: +<span id="bonus-papa">5</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-papa">15000 🪙</button>
+  </div>
+
+  <!-- Катя (Редкий) -->
+  <div class="shop-item rare" id="item-katya">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-katya">✨</div>
+      <div>
+        <span class="char-name">Катя <span id="label-mood-katya">✨</span></span>
+        <span class="char-rarity">Редкий</span>
+        <span class="char-bonus">Буст: +<span id="bonus-katya">10</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-katya">35000 🪙</button>
+  </div>
+
+  <!-- Ксюша (Эпический) -->
+  <div class="shop-item epic" id="item-ksusha">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-ksusha">🔮</div>
+      <div>
+        <span class="char-name">Ксюша <span id="label-mood-ksusha">🔮</span></span>
+        <span class="char-rarity">Эпический</span>
+        <span class="char-bonus">Буст: +<span id="bonus-ksusha">20</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-ksusha">75000 🪙</button>
+  </div>
+
+  <!-- Дима (Эпический) -->
+  <div class="shop-item epic" id="item-dima">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-dima">☄️</div>
+      <div>
+        <span class="char-name">Дима <span id="label-mood-dima">☄️</span></span>
+        <span class="char-rarity">Эпический</span>
+        <span class="char-bonus">Буст: +<span id="bonus-dima">30</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-dima">125000 🪙</button>
+  </div>
+
+  <!-- Тимофей (Мифический) -->
+  <div class="shop-item mythic" id="item-timofey">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-timofey">👺</div>
+      <div>
+        <span class="char-name">Тимофей <span id="label-mood-timofey">👺</span></span>
+        <span class="char-rarity">Мифический</span>
+        <span class="char-bonus">Буст: +<span id="bonus-timofey">60</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-timofey">500000 🪙</button>
+  </div>
+
+  <!-- Ваня (Легендарный) -->
+  <div class="shop-item legendary" id="item-vanya">
+    <div class="shop-item-info">
+      <div class="shop-avatar-emoji" id="emoji-vanya">☀️</div>
+      <div>
+        <span class="char-name">Ваня <span id="label-mood-vanya">☀️</span></span>
+        <span class="char-rarity">Легендарный</span>
+        <span class="char-bonus">Буст: +<span id="bonus-vanya">200</span> к тапу</span>
+      </div>
+    </div>
+    <button class="buy-char-btn" id="btn-buy-vanya">1.0М 🪙</button>
+  </div>
 </div>
 
-<script>
-// Загрузка сохраненных данных
+<div class="leaderboard">
+  <h2>🏆 ТОП ИГРОКОВ</h2>
+  <div class="leader-wrap" id="leaderboard-list">Загрузка топа...</div>
+</div>
 let playerName = localStorage.getItem('sc_player_name') || "";
 let score = Number(localStorage.getItem('sc_score')) || 0;
 let clickPower = Number(localStorage.getItem('sc_v1_clickPower')) || 1;
@@ -68,98 +227,269 @@ let autoScore = Number(localStorage.getItem('sc_autoScore')) || 0;
 let costClick = Number(localStorage.getItem('sc_costClick')) || 15;
 let costAuto = Number(localStorage.getItem('sc_costAuto')) || 50;
 
+// Состояние персонажей
+let charsBought = {
+  papa: localStorage.getItem('sc_has_papa') === 'true',
+  katya: localStorage.getItem('sc_has_katya') === 'true',
+  ksusha: localStorage.getItem('sc_has_ksusha') === 'true',
+  dima: localStorage.getItem('sc_has_dima') === 'true',
+  timofey: localStorage.getItem('sc_has_timofey') === 'true',
+  vanya: localStorage.getItem('sc_has_vanya') === 'true'
+};
+
+// Конфиг персонажей
+const charConfig = {
+  papa: { name: "Папа", basePrice: 15000, baseBonus: 5 },
+  katya: { name: "Катя", basePrice: 35000, baseBonus: 10 },
+  ksusha: { name: "Ксюша", basePrice: 75000, baseBonus: 20 },
+  dima: { name: "Дима", basePrice: 125000, baseBonus: 30 },
+  timofey: { name: "Тимофей", basePrice: 500000, baseBonus: 60 },
+  vanya: { name: "Ваня", basePrice: 1000000, baseBonus: 200 }
+};
+
+// Настроения
+let charsMood = {
+  papa: localStorage.getItem('sc_mood_papa') || 'sad',
+  katya: localStorage.getItem('sc_mood_katya') || 'sad',
+  ksusha: localStorage.getItem('sc_mood_ksusha') || 'sad',
+  dima: localStorage.getItem('sc_mood_dima') || 'sad',
+  timofey: localStorage.getItem('sc_mood_timofey') || 'sad',
+  vanya: localStorage.getItem('sc_mood_vanya') || 'sad'
+};
+
+// Открытые настроения
+let openedMoods = {
+  papa: JSON.parse(localStorage.getItem('sc_op_mood_papa')) || ['sad'],
+  katya: JSON.parse(localStorage.getItem('sc_op_mood_katya')) || ['sad'],
+  ksusha: JSON.parse(localStorage.getItem('sc_op_mood_ksusha')) || ['sad'],
+  dima: JSON.parse(localStorage.getItem('sc_op_mood_dima')) || ['sad'],
+  timofey: JSON.parse(localStorage.getItem('sc_op_mood_timofey')) || ['sad'],
+  vanya: JSON.parse(localStorage.getItem('sc_op_mood_vanya')) || ['sad']
+};
+
+// Локации
+const locations = [
+  { id: 0, name: "Космическая пустота", price: 0, multiplier: 1.0, bg: "linear-gradient(135deg,#0f172a,#1e1b4b)" },
+  { id: 1, name: "Коричневая планета", price: 10000, multiplier: 1.05, bg: "linear-gradient(135deg,#3e2723,#1a0c00)" },
+  { id: 2, name: "Синяя туманность", price: 50000, multiplier: 1.15, bg: "linear-gradient(135deg,#0c4a6e,#031e30)" },
+  { id: 3, name: "Фиолетовая галактика", price: 125000, multiplier: 1.30, bg: "linear-gradient(135deg,#581c87,#2e0854)" },
+  { id: 4, name: "Красный гигант", price: 500000, multiplier: 1.50, bg: "linear-gradient(135deg,#7f1d1d,#450a0a)" },
+  { id: 5, name: "Желтое солнце", price: 1000000, multiplier: 2.0, bg: "linear-gradient(135deg,#78350f,#451a03)" }
+];
+
+let currentLocId = Number(localStorage.getItem('sc_curr_loc')) || 0;
+let openedLocs = JSON.parse(localStorage.getItem('sc_op_locs')) ||;
+
 const balanceEl = document.getElementById('balance');
 const clickPowEl = document.getElementById('click-pow');
 const cpsEl = document.getElementById('cps');
 const leadListEl = document.getElementById('leaderboard-list');
+const mainClicker = document.getElementById('main-clicker');
 
-// ТВОЙ ЛИЧНЫЙ СПИСОК БОТОВ (Меняй имена и очки прямо здесь, как создатель!)
 let staticLeaderboard = [
-  { name: "Alpha_Centauri 🌌", score: 250000 },
-  { name: "Gagarin_99 🚀", score: 100000 },
-  { name: "Марсианин 👽", score: 50000 },
-  { name: "StarLord ⭐", score: 25000 },
-  { name: "Космический Лорд", score: 10000 },
-  { name: "CyberSpit", score: 5000 },
-  { name: "BobaFet_real", score: 2500 },
-  { name: "Илон Маск 🛰️", score: 1200 },
-  { name: "БелкаИСтрелка", score: 600 },
-  { name: "Новичок_007", score: 150 }
+  { name: "Игорь ☄️", score: 25000 }, { name: "Миша 🌌", score: 12000 },
+  { name: "Максим 🚀", score: 5000 }, { name: "Артём 👽", score: 1500 },
+  { name: "Маша 🛰️", score: 350 }
 ];
 
 if (playerName) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('nickname-input').value = playerName;
-  // Если ник уже сохранен, запускаем игру сразу
-  updateUI();
-  checkOfflineIncome();
-  updateLeaderboard();
+  applyBackground(); updateUI(); checkOfflineIncome(); updateLeaderboard();
+}
+
+function applyBackground() { document.body.style.background = locations[currentLocId].bg; }
+function getLocMultiplier() { return locations[currentLocId].multiplier; }
+
+function getSingleCharBonus(key) {
+  if (!charsBought[key]) return 0;
+  let base = charConfig[key].baseBonus;
+  if (charsMood[key] === 'happy') return base * 1.5;
+  if (charsMood[key] === 'angry') return base * 2.0;
+  return base;
+}
+
+function getAllCharsBonus() {
+  let sum = 0; for (let key in charConfig) { sum += getSingleCharBonus(key); } return sum;
 }
 
 function updateUI() {
-  balanceEl.innerText = score + " 🪙";
-  clickPowEl.innerText = clickPower;
-  cpsEl.innerText = autoScore;
+  let mult = getLocMultiplier();
+  let baseClick = clickPower + getAllCharsBonus();
+  balanceEl.innerText = Math.floor(score) + " 🪙";
+  clickPowEl.innerText = Math.floor(baseClick * mult);
+  cpsEl.innerText = Math.floor(autoScore * mult);
   document.getElementById('cost-click').innerText = costClick + " 🪙";
   document.getElementById('cost-auto').innerText = costAuto + " 🪙";
+  
+  updateCharRow('papa', 'btn-buy-papa', '15000 🪙');
+  updateCharRow('katya', 'btn-buy-katya', '35000 🪙');
+  updateCharRow('ksusha', 'btn-buy-ksusha', '75000 🪙');
+  updateCharRow('dima', 'btn-buy-dima', '125000 🪙');
+  updateCharRow('timofey', 'btn-buy-timofey', '500000 🪙');
+  updateCharRow('vanya', 'btn-buy-vanya', '1.0М 🪙');
+
+  if (charsBought.vanya) mainClicker.innerText = "☀️";
+  else if (charsBought.timofey) mainClicker.innerText = "👺";
+  else if (charsBought.dima) mainClicker.innerText = "☄️";
+  else if (charsBought.ksusha) mainClicker.innerText = "🔮";
+  else if (charsBought.katya) mainClicker.innerText = "✨";
+  else if (charsBought.papa) mainClicker.innerText = "👨‍🚀";
+  else mainClicker.innerText = "🛸";
 }
 
+function updateCharRow(key, btnId, defaultText) {
+  const btn = document.getElementById(btnId);
+  const bonusEl = document.getElementById(`bonus-${key}`);
+  const labelMood = document.getElementById(`label-mood-${key}`);
+  const emojiEl = document.getElementById(`emoji-${key}`);
+  let curB = charConfig[key].baseBonus;
+  if (charsMood[key] === 'happy') curB *= 1.5;
+  if (charsMood[key] === 'angry') curB *= 2.0;
+  if (bonusEl) bonusEl.innerText = curB;
+
+  if (charsBought[key]) {
+    btn.innerText = "УПРАВЛЕНИЕ"; btn.style.background = "#059669";
+    if (charsMood[key] === 'happy') { labelMood.innerText = "[Весёлый 😄]"; emojiEl.innerText = "😄"; }
+    else if (charsMood[key] === 'angry') { labelMood.innerText = "[Злой 😡]"; emojiEl.innerText = "😡"; }
+    else { labelMood.innerText = "[Грустный 😢]"; emojiEl.innerText = "😢"; }
+  } else {
+    btn.innerText = defaultText; btn.style.background = ""; if (labelMood) labelMood.innerText = "";
+  }
+}
 function saveGame() {
   localStorage.setItem('sc_score', score);
   localStorage.setItem('sc_v1_clickPower', clickPower);
   localStorage.setItem('sc_autoScore', autoScore);
   localStorage.setItem('sc_costClick', costClick);
   localStorage.setItem('sc_costAuto', costAuto);
+  for (let key in charsBought) {
+    localStorage.setItem(`sc_has_${key}`, charsBought[key]);
+    localStorage.setItem(`sc_mood_${key}`, charsMood[key]);
+    localStorage.setItem(`sc_op_mood_${key}`, JSON.stringify(openedMoods[key]));
+  }
+  localStorage.setItem('sc_curr_loc', currentLocId);
+  localStorage.setItem('sc_op_locs', JSON.stringify(openedLocs));
   localStorage.setItem('sc_last_time', Math.floor(Date.now() / 1000));
 }
 
-function checkOfflineIncome() {
-  if (autoScore > 0) {
-    let lastTime = Number(localStorage.getItem('sc_last_time')) || 0;
-    if (lastTime > 0) {
-      let currentTime = Math.floor(Date.now() / 1000);
-      let secondsPassed = currentTime - lastTime;
-      if (secondsPassed > 43200) secondsPassed = 43200; // Ограничение 12 часов
-      if (secondsPassed > 10) {
-        let income = secondsPassed * autoScore;
-        score += income;
-        document.getElementById('offline-report').innerText = `Пока вас не было ${secondsPassed} сек., ваши автоматические майнеры добыли ${income} 🪙!`;
-        document.getElementById('offline-screen').style.display = 'flex';
-        updateUI();
-        saveGame();
-        updateLeaderboard();
+function resetUpgrades() {
+  clickPower = 1; autoScore = 0; costClick = 15; costAuto = 50;
+}
+
+function renderLocations() {
+  const container = document.getElementById('locations-list');
+  container.innerHTML = "";
+  locations.forEach(loc => {
+    let isOpened = openedLocs.includes(loc.id);
+    let isActive = currentLocId === loc.id;
+    let itemHtml = document.createElement('div');
+    itemHtml.className = isActive ? "loc-item active" : "loc-item";
+    let info = `<div><strong>${loc.name}</strong><br><span style="color:#22c55e">Буст: х${loc.multiplier}</span></div>`;
+    let btnText = isActive ? "АКТИВЕН" : (isOpened ? "ВЫБРАТЬ" : `${loc.price} 🪙`);
+    let btn = document.createElement('button');
+    btn.className = "loc-btn"; btn.innerText = btnText;
+    if (isActive) btn.disabled = true;
+    btn.addEventListener('click', () => {
+      if (isOpened) {
+        currentLocId = loc.id; applyBackground(); closeModal(); updateUI(); saveGame(); updateLeaderboard();
+      } else {
+        if (score >= loc.price) {
+          score -= loc.price; openedLocs.push(loc.id); currentLocId = loc.id;
+          applyBackground(); closeModal(); updateUI(); saveGame(); updateLeaderboard();
+        } else { alert("Не хватает монет!"); }
       }
-    }
+    });
+    itemHtml.innerHTML = info; itemHtml.appendChild(btn); container.appendChild(itemHtml);
+  });
+}
+
+function renderMoods(key) {
+  const config = charConfig[key];
+  document.getElementById('mood-modal-title').innerText = `🎭 НАСТРОЕНИЕ: ${config.name}`;
+  const container = document.getElementById('moods-list');
+  container.innerHTML = "";
+  const stages = [
+    { id: 'sad', name: "Грустный 😢", mult: "x1.0", price: 0 },
+    { id: 'happy', name: "Весёлый 😄", mult: "x1.5", price: Math.round(config.basePrice * 1.75) },
+    { id: 'angry', name: "Злой 😡", mult: "x2.0", price: Math.round(config.basePrice * 2.25) }
+  ];
+  stages.forEach(stage => {
+    let isOpened = openedMoods[key].includes(stage.id);
+    let isActive = charsMood[key] === stage.id;
+    let itemHtml = document.createElement('div');
+    itemHtml.className = "mood-item";
+    if (isActive) itemHtml.style.borderColor = "#a855f7";
+    let info = `<div><strong>${stage.name}</strong><br><span style="color:#a855f7">Бонус: ${stage.mult}</span></div>`;
+    let btnText = isActive ? "АКТИВНО" : (isOpened ? "ВКЛЮЧИТЬ" : `${stage.price} 🪙`);
+    let btn = document.createElement('button');
+    btn.className = "mood-btn"; btn.innerText = btnText;
+    if (isActive) btn.disabled = true;
+    btn.addEventListener('click', () => {
+      if (isOpened) {
+        charsMood[key] = stage.id; closeModal(); updateUI(); saveGame(); updateLeaderboard();
+      } else {
+        if (score >= stage.price) {
+          score -= stage.price; openedMoods[key].push(stage.id); charsMood[key] = stage.id;
+          closeModal(); updateUI(); saveGame(); updateLeaderboard();
+        } else { alert("Не хватает монет!"); }
+      }
+    });
+    itemHtml.innerHTML = info; itemHtml.appendChild(btn); container.appendChild(itemHtml);
+  });
+}
+
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal() {
+  document.getElementById('locations-modal').style.display = 'none';
+  document.getElementById('moods-modal').style.display = 'none';
+}
+
+function handleCharClick(key) {
+  const config = charConfig[key];
+  if (charsBought[key]) {
+    renderMoods(key); openModal('moods-modal');
+  } else {
+    if (score >= config.basePrice) {
+      score -= config.basePrice; charsBought[key] = true; resetUpgrades();
+      alert(`🎉 Открыт персонаж ${config.name}! Обычные улучшения сброшены.`);
+      saveGame(); updateUI(); updateLeaderboard();
+    } else { alert(`Нужно ${config.basePrice} 🪙!`); }
   }
 }
 
-// Функция обновления и сортировки ТОПа
-function updateLeaderboard() {
-  // Добавляем текущего игрока к списку ботов
-  let fullList = [...staticLeaderboard, { name: playerName + " (Вы)", score: score }];
-  
-  // Сортируем по убыванию очков
-  fullList.sort((a, b) => b.score - a.score);
-  
-  // Генерируем HTML
-  let html = "";
-  fullList.forEach((player, index) => {
-    let isMe = player.name === playerName + " (Вы)";
-    let rowClass = isMe ? "leader-item my-row" : "leader-item";
-    
-    html += `
-      <div class="${rowClass}">
-        <span><span class="player-pos">#${index + 1}</span>${player.name}</span>
-        <span>${player.score} 🪙</span>
-      </div>
-    `;
-  });
-  
-  leadListEl.innerHTML = html;
-}
+document.getElementById('item-papa').addEventListener('click', () => handleCharClick('papa'));
+document.getElementById('item-katya').addEventListener('click', () => handleCharClick('katya'));
+document.getElementById('item-ksusha').addEventListener('click', () => handleCharClick('ksusha'));
+document.getElementById('item-dima').addEventListener('click', () => handleCharClick('dima'));
+document.getElementById('item-timofey').addEventListener('click', () => handleCharClick('timofey'));
+document.getElementById('item-vanya').addEventListener('click', () => handleCharClick('vanya'));
 
-document.getElementById('btn-offline-claim').addEventListener('click', () => {
-  document.getElementById('offline-screen').style.display = 'none';
+document.getElementById('open-loc-btn').addEventListener('click', () => { renderLocations(); openModal('locations-modal'); });
+document.getElementById('close-loc-btn').addEventListener('click', closeModal);
+document.getElementById('close-mood-btn').addEventListener('click', closeModal);
+document.getElementById('btn-offline-claim').addEventListener('click', () => { document.getElementById('offline-screen').style.display = 'none'; });
+
+mainClicker.addEventListener('click', (e) => {
+  let mult = getLocMultiplier();
+  let addedCoins = Math.floor((clickPower + getAllCharsBonus()) * mult);
+  score += addedCoins;
+  const rect = mainClicker.getBoundingClientRect();
+  const x = e.clientX || (rect.left + rect.width / 2);
+  const y = e.clientY || (rect.top + rect.height / 2);
+  const textNode = document.createElement('div');
+  textNode.className = 'floating-text'; textNode.innerText = `+${addedCoins}`;
+  textNode.style.left = `${x}px`; textNode.style.top = `${y}px`;
+  document.body.appendChild(textNode);
+  setTimeout(() => textNode.remove(), 500);
+  updateUI(); saveGame(); updateLeaderboard();
+});
+
+document.getElementById('btn-up-click').addEventListener('click', () => {
+  if (score >= costClick) { score -= costClick; clickPower += 1; costClick = Math.round(costClick * 1.5); updateUI(); saveGame(); updateLeaderboard(); }
+});
+document.getElementById('btn-up-auto').addEventListener('click', () => {
+  if (score >= costAuto) { score -= costAuto; autoScore += 1; costAuto = Math.round(costAuto * 1.6); updateUI(); saveGame(); updateLeaderboard(); }
 });
 
 document.getElementById('btn-start').addEventListener('click', () => {
@@ -167,50 +497,49 @@ document.getElementById('btn-start').addEventListener('click', () => {
   playerName = inputName ? inputName : "Игрок_" + Math.floor(Math.random() * 1000);
   localStorage.setItem('sc_player_name', playerName);
   document.getElementById('login-screen').style.display = 'none';
-  saveGame();
-  updateUI();
-  checkOfflineIncome();
-  updateLeaderboard();
+  applyBackground(); updateUI(); checkOfflineIncome(); updateLeaderboard();
 });
 
-document.getElementById('main-clicker').addEventListener('click', () => {
-  score += clickPower;
-  updateUI();
-  saveGame();
-  updateLeaderboard(); // Обновляем топ при клике
-});
-
-document.getElementById('btn-up-click').addEventListener('click', () => {
-  if (score >= costClick) {
-    score -= costClick;
-    clickPower += 1;
-    costClick = Math.round(costClick * 1.5);
-    updateUI();
-    saveGame();
-    updateLeaderboard();
-  }
-});
-
-document.getElementById('btn-up-auto').addEventListener('click', () => {
-  if (score >= costAuto) {
-    score -= costAuto;
-    autoScore += 1;
-    costAuto = Math.round(costAuto * 1.6);
-    updateUI();
-    saveGame();
-    updateLeaderboard();
-  }
-});
-
-// Ежесекундный авто-майнинг
 setInterval(() => {
-  if (autoScore > 0) {
-    score += autoScore;
-    updateUI();
-    saveGame();
-    updateLeaderboard(); // Обновляем топ каждую секунду от авто-майнера
+  if (autoScore > 0 && document.getElementById('login-screen').style.display === 'none') {
+    score += autoScore * getLocMultiplier(); updateUI(); saveGame(); updateLeaderboard();
   }
 }, 1000);
+
+function checkOfflineIncome() {
+  if (autoScore > 0) {
+    let lastTime = Number(localStorage.getItem('sc_last_time')) || 0;
+    if (lastTime > 0) {
+      let secondsPassed = Math.floor(Date.now() / 1000) - lastTime;
+      if (secondsPassed > 43200) secondsPassed = 43200;
+      if (secondsPassed > 10) {
+        let income = Math.floor(secondsPassed * autoScore * getLocMultiplier()); score += income;
+        document.getElementById('offline-report').innerText = `Пока вас не было ${secondsPassed} сек., добыто ${income} 🪙!`;
+        document.getElementById('offline-screen').style.display = 'flex';
+        updateUI(); saveGame(); updateLeaderboard();
+      }
+    }
+  }
+}
+
+function updateLeaderboard() {
+  let titleAdd = "";
+  if (charsBought.vanya) titleAdd = " [Легенда ☀️]";
+  else if (charsBought.timofey) titleAdd = " [Мифик 👺]";
+  else if (charsBought.dima || charsBought.ksusha) titleAdd = " [Эпик 🔮]";
+  else if (charsBought.papa || charsBought.katya) titleAdd = " [Редкий 👑]";
+  let myName = playerName + titleAdd + " (Вы)";
+  let fullList = [...staticLeaderboard, { name: myName, score: Math.floor(score) }];
+  fullList.sort((a, b) => b.score - a.score);
+  let html = "";
+  fullList.forEach((player, index) => {
+    let isMe = player.name.includes("(Вы)");
+    let rowClass = isMe ? "leader-item my-row" : "leader-item";
+    html += `<div class="${rowClass}"><span><span class="player-pos">#${index + 1}</span>${player.name}</span><span>${player.score} 🪙</span></div>`;
+  });
+  leadListEl.innerHTML = html;
+}
 </script>
 </body>
 </html>
+Comment
