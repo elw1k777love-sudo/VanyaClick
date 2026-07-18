@@ -20,112 +20,197 @@ h1{font-size:24px;color:#38bdf8;text-transform:uppercase;margin:5px}
 .price{color:#fcd34d;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:6px}
 .leaderboard{background:rgba(0,0,0,0.4);border-radius:16px;padding:15px;margin:20px auto 0;max-width:320px;box-sizing:border-box;border:1px solid rgba(56,189,248,0.2)}
 .leaderboard h2{font-size:18px;color:#38bdf8;margin:0 0 10px 0;text-transform:uppercase}
-.leader-wrap{max-height:150px;overflow-y:auto;margin-bottom:5px}
-.leader-item{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px}
-.leader-item.my-row{background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:8px;margin-top:5px}
-.player-pos{color:#38bdf8;font-weight:700;margin-right:5px}
+.leader-wrap{max-height:180px;overflow-y:auto;margin-bottom:5px}
+.leader-item{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px;text-align:left}
+.leader-item.my-row{background:rgba(245,158,11,0.2);border:1px solid #f59e0b;border-radius:8px;margin-top:2px;font-weight:bold;color:#fcd34d}
+.player-pos{color:#38bdf8;font-weight:700;margin-right:8px}
 </style>
-
-<!-- Надежные CDN-ссылки на Firebase -->
-<script src="https://cloudflare.com"></script>
-<script src="https://cloudflare.com"></script>
 </head>
 <body>
-<div id="login-screen"><div class="login-box"><h2>ВХОД В ИГРУ</h2><input type="text" id="nickname-input" class="game-input" placeholder="Введите ваш ник..." maxlength="14"><button class="game-btn" id="btn-start">ИГРАТЬ</button></div></div>
-<div id="offline-screen"><div class="offline-box"><h2 style="color:#fcd34d;margin:0 0 10px 0">🤖 С ВОЗВРАЩЕНИЕМ!</h2><p id="offline-report" style="font-size:16px;color:#e2e8f0;line-height:1.5;margin:15px 0">Майнеры трудились в ваше отсутствие!</p><button class="game-btn" id="btn-offline-claim">ЗАБРАТЬ МОНЕТЫ</button></div></div>
+
+<div id="login-screen">
+  <div class="login-box">
+    <h2>ВХОД В ИГРУ</h2>
+    <input type="text" id="nickname-input" class="game-input" placeholder="Введите ваш ник..." maxlength="14">
+    <button class="game-btn" id="btn-start">ИГРАТЬ</button>
+  </div>
+</div>
+
+<div id="offline-screen">
+  <div class="offline-box">
+    <h2 style="color:#fcd34d;margin:0 0 10px 0">🤖 С ВОЗВРАЩЕНИЕМ!</h2>
+    <p id="offline-report" style="font-size:16px;color:#e2e8f0;line-height:1.5;margin:15px 0">Майнеры трудились в ваше отсутствие!</p>
+    <button class="game-btn" id="btn-offline-claim">ЗАБРАТЬ МОНЕТЫ</button>
+  </div>
+</div>
+
 <h1>Space Clicker 🚀</h1>
-<div class="score-box"><div class="coins" id="balance">0 🪙</div><div style="color:#94a3b8;font-size:13px;margin-top:5px">Клик: +<span id="click-pow">1</span> | Авто: +<span id="cps">0</span>/с</div></div>
+<div class="score-box">
+  <div class="coins" id="balance">0 🪙</div>
+  <div style="color:#94a3b8;font-size:13px;margin-top:5px">Клик: +<span id="click-pow">1</span> | Авто: +<span id="cps">0</span>/с</div>
+</div>
+
 <div class="target-btn" id="main-clicker">🛸</div>
 <button class="up-button" id="btn-up-click"><span>⚡ Сила тапа (+1)</span><span class="price" id="cost-click">15 🪙</span></button>
 <button class="up-button" id="btn-up-auto"><span>🤖 Авто-майнер (+1/с)</span><span class="price" id="cost-auto">50 🪙</span></button>
-<div class="leaderboard"><h2>🏆 ТОП ИГРОКОВ (100 мест)</h2><div class="leader-wrap" id="leaderboard-list">Подключение...</div></div>
+
+<div class="leaderboard">
+  <h2>🏆 ТОП ИГРОКОВ</h2>
+  <div class="leader-wrap" id="leaderboard-list">Загрузка космического топа...</div>
+</div>
 
 <script>
-// Твой полный и безошибочный конфиг
-const firebaseConfig = {
-  apiKey: "AIzaSyDpk-MSubFJQrg3TXHHGZywKWhpms0yWFs",
-  authDomain: "://firebaseapp.com",
-  databaseURL: "https://firebasedatabase.app",
-  projectId: "click-f3faa",
-  storageBucket: "click-f3faa.firebasestorage.app",
-  messagingSenderId: "329759495670",
-  appId: "1:329759495670:web:8f5c3f71616cdaae25f69f",
-  measurementId: "G-V5Z016N7PX"
-};
+// Загрузка сохраненных данных
+let playerName = localStorage.getItem('sc_player_name') || "";
+let score = Number(localStorage.getItem('sc_score')) || 0;
+let clickPower = Number(localStorage.getItem('sc_v1_clickPower')) || 1;
+let autoScore = Number(localStorage.getItem('sc_autoScore')) || 0;
+let costClick = Number(localStorage.getItem('sc_costClick')) || 15;
+let costAuto = Number(localStorage.getItem('sc_costAuto')) || 50;
 
-let database = null;
-try {
-  firebase.initializeApp(firebaseConfig);
-  database = firebase.database();
-} catch(e) {
-  console.log("Firebase ошибка:", e);
+const balanceEl = document.getElementById('balance');
+const clickPowEl = document.getElementById('click-pow');
+const cpsEl = document.getElementById('cps');
+const leadListEl = document.getElementById('leaderboard-list');
+
+// ТВОЙ ЛИЧНЫЙ СПИСОК БОТОВ (Меняй имена и очки прямо здесь, как создатель!)
+let staticLeaderboard = [
+  { name: "Alpha_Centauri 🌌", score: 250000 },
+  { name: "Gagarin_99 🚀", score: 100000 },
+  { name: "Марсианин 👽", score: 50000 },
+  { name: "StarLord ⭐", score: 25000 },
+  { name: "Космический Лорд", score: 10000 },
+  { name: "CyberSpit", score: 5000 },
+  { name: "BobaFet_real", score: 2500 },
+  { name: "Илон Маск 🛰️", score: 1200 },
+  { name: "БелкаИСтрелка", score: 600 },
+  { name: "Новичок_007", score: 150 }
+];
+
+if (playerName) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('nickname-input').value = playerName;
+  // Если ник уже сохранен, запускаем игру сразу
+  updateUI();
+  checkOfflineIncome();
+  updateLeaderboard();
 }
 
-let playerName=localStorage.getItem('sc_player_name')||"";
-if(playerName){document.getElementById('login-screen').style.display='none';document.getElementById('nickname-input').value=playerName}
-let score=Number(localStorage.getItem('sc_score'))||0;
-let clickPower=Number(localStorage.getItem('sc_v1_clickPower'))||1;
-let autoScore=Number(localStorage.getItem('sc_autoScore'))||0;
-let costClick=Number(localStorage.getItem('sc_costClick'))||15;
-let costAuto=Number(localStorage.getItem('sc_costAuto'))||50;
-const balanceEl=document.getElementById('balance');
-const clickPowEl=document.getElementById('click-pow');
-const cpsEl=document.getElementById('cps');
-const leadListEl=document.getElementById('leaderboard-list');
+function updateUI() {
+  balanceEl.innerText = score + " 🪙";
+  clickPowEl.innerText = clickPower;
+  cpsEl.innerText = autoScore;
+  document.getElementById('cost-click').innerText = costClick + " 🪙";
+  document.getElementById('cost-auto').innerText = costAuto + " 🪙";
+}
 
-function updateUI(){balanceEl.innerText=score+" 🪙";clickPowEl.innerText=clickPower;cpsEl.innerText=autoScore;document.getElementById('cost-click').innerText=costClick+" 🪙";document.getElementById('cost-auto').innerText=costAuto+" 🪙"}
+function saveGame() {
+  localStorage.setItem('sc_score', score);
+  localStorage.setItem('sc_v1_clickPower', clickPower);
+  localStorage.setItem('sc_autoScore', autoScore);
+  localStorage.setItem('sc_costClick', costClick);
+  localStorage.setItem('sc_costAuto', costAuto);
+  localStorage.setItem('sc_last_time', Math.floor(Date.now() / 1000));
+}
 
-function saveGame(){
-  localStorage.setItem('sc_score',score);
-  localStorage.setItem('sc_v1_clickPower',clickPower);
-  localStorage.setItem('sc_autoScore',autoScore);
-  localStorage.setItem('sc_costClick',costClick);
-  localStorage.setItem('sc_costAuto',costAuto);
-  localStorage.setItem('sc_last_time',Math.floor(Date.now()/1000));
-  if(playerName && database){
-    database.ref('users/'+playerName).set({score:score}).catch(e=>console.log(e));
+function checkOfflineIncome() {
+  if (autoScore > 0) {
+    let lastTime = Number(localStorage.getItem('sc_last_time')) || 0;
+    if (lastTime > 0) {
+      let currentTime = Math.floor(Date.now() / 1000);
+      let secondsPassed = currentTime - lastTime;
+      if (secondsPassed > 43200) secondsPassed = 43200; // Ограничение 12 часов
+      if (secondsPassed > 10) {
+        let income = secondsPassed * autoScore;
+        score += income;
+        document.getElementById('offline-report').innerText = `Пока вас не было ${secondsPassed} сек., ваши автоматические майнеры добыли ${income} 🪙!`;
+        document.getElementById('offline-screen').style.display = 'flex';
+        updateUI();
+        saveGame();
+        updateLeaderboard();
+      }
+    }
   }
 }
 
-function checkOfflineIncome(){if(autoScore > 0){let lastTime=Number(localStorage.getItem('sc_last_time'))||0;if(lastTime > 0){let currentTime=Math.floor(Date.now()/1000);let secondsPassed=currentTime-lastTime;if(secondsPassed > 43200)secondsPassed=43200;if(secondsPassed > 10){let income=secondsPassed * autoScore;score+=income;document.getElementById('offline-report').innerText=`Пока вас не было ${secondsPassed} сек., ваши автоматические майнеры добыли ${income} 🪙!`;document.getElementById('offline-screen').style.display='flex';updateUI();saveGame()}}}}
-document.getElementById('btn-offline-claim').addEventListener('click',()=>{document.getElementById('offline-screen').style.display='none'});
+// Функция обновления и сортировки ТОПа
+function updateLeaderboard() {
+  // Добавляем текущего игрока к списку ботов
+  let fullList = [...staticLeaderboard, { name: playerName + " (Вы)", score: score }];
+  
+  // Сортируем по убыванию очков
+  fullList.sort((a, b) => b.score - a.score);
+  
+  // Генерируем HTML
+  let html = "";
+  fullList.forEach((player, index) => {
+    let isMe = player.name === playerName + " (Вы)";
+    let rowClass = isMe ? "leader-item my-row" : "leader-item";
+    
+    html += `
+      <div class="${rowClass}">
+        <span><span class="player-pos">#${index + 1}</span>${player.name}</span>
+        <span>${player.score} 🪙</span>
+      </div>
+    `;
+  });
+  
+  leadListEl.innerHTML = html;
+}
 
-document.getElementById('btn-start').addEventListener('click',()=>{
-  let inputName=document.getElementById('nickname-input').value.trim();
-  playerName=inputName?inputName:"Игрок_"+Math.floor(Math.random()*1000);
-  localStorage.setItem('sc_player_name',playerName);
-  document.getElementById('login-screen').style.display='none';
+document.getElementById('btn-offline-claim').addEventListener('click', () => {
+  document.getElementById('offline-screen').style.display = 'none';
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  let inputName = document.getElementById('nickname-input').value.trim();
+  playerName = inputName ? inputName : "Игрок_" + Math.floor(Math.random() * 1000);
+  localStorage.setItem('sc_player_name', playerName);
+  document.getElementById('login-screen').style.display = 'none';
   saveGame();
   updateUI();
   checkOfflineIncome();
-  initLeaderboard();
+  updateLeaderboard();
 });
 
-document.getElementById('main-clicker').addEventListener('click',()=>{score+=clickPower;updateUI();saveGame()});
-document.getElementById('btn-up-click').addEventListener('click',()=>{if(score >= costClick){score-=costClick;clickPower+=1;costClick=Math.round(costClick*1.5);updateUI();saveGame()}});
-document.getElementById('btn-up-auto').addEventListener('click',()=>{if(score >= costAuto){score-=costAuto;autoScore+=1;costAuto=Math.round(costAuto*1.6);updateUI();saveGame()}});
-setInterval(()=>{score+=autoScore;updateUI();if(autoScore > 0)saveGame()},1000);
+document.getElementById('main-clicker').addEventListener('click', () => {
+  score += clickPower;
+  updateUI();
+  saveGame();
+  updateLeaderboard(); // Обновляем топ при клике
+});
 
-function initLeaderboard(){
-  if(!database) {
-    leadListEl.innerText = "Ошибка сети";
-    return;
+document.getElementById('btn-up-click').addEventListener('click', () => {
+  if (score >= costClick) {
+    score -= costClick;
+    clickPower += 1;
+    costClick = Math.round(costClick * 1.5);
+    updateUI();
+    saveGame();
+    updateLeaderboard();
   }
-  database.ref('users').orderByChild('score').limitToLast(100).on('value',(snapshot)=>{
-    let players=[];
-    snapshot.forEach((childSnapshot)=>{players.push({name:childSnapshot.key,score:childSnapshot.val().score||0})});
-    players.reverse();
-    leadListEl.innerHTML="";
-    players.forEach((player,index)=>{
-      let isMe=(player.name===playerName);
-      leadListEl.innerHTML+=`<div class="leader-item ${isMe?'my-row':''}"><span><span class="player-pos">#${index+1}</span> ${player.name}</span><span>${player.score} 🪙</span></div>`
-    });
-    if(players.length===0)leadListEl.innerText="Список пуст.";
-  },(error)=>{
-    leadListEl.innerText="Ошибка: "+error.message;
-  });
-}
-if(playerName){updateUI();checkOfflineIncome();initLeaderboard()}
+});
+
+document.getElementById('btn-up-auto').addEventListener('click', () => {
+  if (score >= costAuto) {
+    score -= costAuto;
+    autoScore += 1;
+    costAuto = Math.round(costAuto * 1.6);
+    updateUI();
+    saveGame();
+    updateLeaderboard();
+  }
+});
+
+// Ежесекундный авто-майнинг
+setInterval(() => {
+  if (autoScore > 0) {
+    score += autoScore;
+    updateUI();
+    saveGame();
+    updateLeaderboard(); // Обновляем топ каждую секунду от авто-майнера
+  }
+}, 1000);
 </script>
 </body>
 </html>
